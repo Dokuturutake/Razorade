@@ -1,6 +1,6 @@
 name: Deploy to GitHub Pages
 
-# このワークフローは、mainブランチへのpushまたはworkflow_dispatchイベントでトリガーされます。
+# このワークフローは、masterブランチへのpushまたはworkflow_dispatchイベントでトリガーされます。
 on:
   push:
     branches: ["master"]
@@ -41,7 +41,7 @@ jobs:
         run: dotnet workload install wasm-tools
 
       - name: Publish # アプリケーションをパブリッシュします。
-        run: dotnet publish H2O-MG/H2O-MG.csproj -p:GHPages=true -c:Release -o:publish
+        run: dotnet publish Razorade/Razorade.csproj -p:GHPages=true -c:Release -o:publish
 
       - name: Upload Pages Artifact # Pagesのアーティファクトをアップロードします。
         uses: actions/upload-pages-artifact@v3
