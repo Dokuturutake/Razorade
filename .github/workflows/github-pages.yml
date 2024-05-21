@@ -1,0 +1,53 @@
+name: Deploy to GitHub Pages
+
+# このワークフローは、mainブランチへのpushまたはworkflow_dispatchイベントでトリガーされます。
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+# このワークフローでは、リポジトリのコンテンツの読み取り、Pagesへの書き込み、IDトークンの書き込みの権限が必要です。
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# concurrencyを使用して、同時に実行されるデプロイを制御します。
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # 環境変数としてgithub-pagesを設定し、デプロイ後のURLを取得します。
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest # Ubuntu最新バージョンのランナーで実行します。
+
+    steps:
+      - name: Checkout # リポジトリをチェックアウトします。
+        uses: actions/checkout@v4
+
+      - name: Setup Pages # GitHub Pagesの設定を行います。
+        uses: actions/configure-pages@v4
+
+      - name: Setup .NET # .NET環境をセットアップします。
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x # .NETのバージョンを指定します。
+
+      - name: Install wasm-tools # wasm-toolsをインストールします。
+        run: dotnet workload install wasm-tools
+
+      - name: Publish # アプリケーションをパブリッシュします。
+        run: dotnet publish H2O-MG/H2O-MG.csproj -p:GHPages=true -c:Release -o:publish
+
+      - name: Upload Pages Artifact # Pagesのアーティファクトをアップロードします。
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "publish/wwwroot" # アップロードするパスを指定します。
+
+      - name: Deploy to GitHub Pages # GitHub Pagesにデプロイします。
+        id: deployment
+        uses: actions/deploy-pages@v4
