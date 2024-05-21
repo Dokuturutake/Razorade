@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 # このワークフローは、mainブランチへのpushまたはworkflow_dispatchイベントでトリガーされます。
 on:
   push:
-    branches: ["main"]
+    branches: ["master"]
   workflow_dispatch:
 
 # このワークフローでは、リポジトリのコンテンツの読み取り、Pagesへの書き込み、IDトークンの書き込みの権限が必要です。
